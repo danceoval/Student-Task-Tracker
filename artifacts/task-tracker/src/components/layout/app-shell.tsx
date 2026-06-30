@@ -30,7 +30,7 @@ export function AppShell({ children }: AppShellProps) {
             <BookMarked className="text-primary-foreground w-5 h-5" />
           </div>
           <div>
-            <h1 className="font-serif font-semibold text-lg leading-tight text-foreground">CourseTask</h1>
+            <h1 className="font-serif font-semibold text-lg leading-tight text-foreground">Task Tracker</h1>
             <p className="text-[11px] text-muted-foreground uppercase tracking-widest font-semibold font-sans">Command Center</p>
           </div>
         </div>
