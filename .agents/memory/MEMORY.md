@@ -1,0 +1,1 @@
+- [Seeding without tsx](seeding-without-tsx.md) — tsx isn't installable here; seed via an idempotent exported function called from the esbuild-bundled api-server startup, not a standalone TS CLI.

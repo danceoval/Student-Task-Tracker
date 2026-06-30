@@ -123,7 +123,8 @@ export const ListTasksQueryParams = zod.object({
   "courseId": zod.coerce.number().optional(),
   "status": zod.enum(['all', 'active', 'completed']).optional().describe('Filter by completion status'),
   "priority": zod.enum(['low', 'medium', 'high']).optional(),
-  "type": zod.enum(['assignment', 'reading', 'exam', 'project', 'other']).optional()
+  "type": zod.enum(['assignment', 'reading', 'exam', 'project', 'other']).optional(),
+  "due": zod.enum(['all', 'overdue', 'today', 'week', 'month', 'none']).optional().describe('Filter by due-date window relative to today')
 })
 
 export const ListTasksResponseItem = zod.object({

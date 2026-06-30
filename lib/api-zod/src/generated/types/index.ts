@@ -14,6 +14,7 @@ export * from './dashboardSummary';
 export * from './error';
 export * from './getUpcomingTasksParams';
 export * from './healthStatus';
+export * from './listTasksDue';
 export * from './listTasksParams';
 export * from './listTasksPriority';
 export * from './listTasksStatus';

@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { ListTasksDue } from './listTasksDue';
 import type { ListTasksPriority } from './listTasksPriority';
 import type { ListTasksStatus } from './listTasksStatus';
 import type { ListTasksType } from './listTasksType';
@@ -17,4 +18,8 @@ courseId?: number;
 status?: ListTasksStatus;
 priority?: ListTasksPriority;
 type?: ListTasksType;
+/**
+ * Filter by due-date window relative to today
+ */
+due?: ListTasksDue;
 };

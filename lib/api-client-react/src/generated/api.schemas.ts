@@ -174,6 +174,10 @@ courseId?: number;
 status?: ListTasksStatus;
 priority?: ListTasksPriority;
 type?: ListTasksType;
+/**
+ * Filter by due-date window relative to today
+ */
+due?: ListTasksDue;
 };
 
 export type ListTasksStatus = typeof ListTasksStatus[keyof typeof ListTasksStatus];
@@ -203,6 +207,18 @@ export const ListTasksType = {
   exam: 'exam',
   project: 'project',
   other: 'other',
+} as const;
+
+export type ListTasksDue = typeof ListTasksDue[keyof typeof ListTasksDue];
+
+
+export const ListTasksDue = {
+  all: 'all',
+  overdue: 'overdue',
+  today: 'today',
+  week: 'week',
+  month: 'month',
+  none: 'none',
 } as const;
 
 export type GetUpcomingTasksParams = {

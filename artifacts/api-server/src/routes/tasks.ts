@@ -1,7 +1,13 @@
 import { Router, type IRouter } from "express";
 import { db, tasksTable, coursesTable } from "@workspace/db";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gte, lte, isNull } from "drizzle-orm";
 import { CreateTaskBody, UpdateTaskBody } from "@workspace/api-zod";
+
+function isoDate(offsetDays = 0): string {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().slice(0, 10);
+}
 
 const router: IRouter = Router();
 
@@ -28,6 +34,20 @@ router.get("/tasks", async (req, res) => {
   }
   if (typeof req.query.type === "string") {
     conditions.push(eq(tasksTable.type, req.query.type));
+  }
+  const due = req.query.due;
+  if (due === "none") {
+    conditions.push(isNull(tasksTable.dueDate));
+  } else if (due === "overdue") {
+    conditions.push(lte(tasksTable.dueDate, isoDate(-1)));
+  } else if (due === "today") {
+    conditions.push(eq(tasksTable.dueDate, isoDate(0)));
+  } else if (due === "week") {
+    conditions.push(gte(tasksTable.dueDate, isoDate(0)));
+    conditions.push(lte(tasksTable.dueDate, isoDate(7)));
+  } else if (due === "month") {
+    conditions.push(gte(tasksTable.dueDate, isoDate(0)));
+    conditions.push(lte(tasksTable.dueDate, isoDate(30)));
   }
 
   const rows = await db

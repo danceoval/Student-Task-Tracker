@@ -1,3 +1,4 @@
+import { seedDatabaseIfEmpty } from "@workspace/db";
 import app from "./app";
 import { logger } from "./lib/logger";
 
@@ -22,4 +23,14 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+
+  seedDatabaseIfEmpty()
+    .then(({ seeded }) => {
+      if (seeded) {
+        logger.info("Database was empty; seeded example courses and tasks");
+      }
+    })
+    .catch((err) => {
+      logger.error({ err }, "Failed to seed database");
+    });
 });

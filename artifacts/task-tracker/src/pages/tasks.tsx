@@ -25,6 +25,7 @@ export default function Tasks() {
   const [status, setStatus] = useState<"all" | "active" | "completed">("active");
   const [courseId, setCourseId] = useState<string>("all");
   const [priority, setPriority] = useState<string>("all");
+  const [due, setDue] = useState<string>("all");
 
   const { data: courses = [] } = useListCourses();
   
@@ -32,6 +33,7 @@ export default function Tasks() {
     status: status,
     courseId: courseId !== "all" ? Number(courseId) : undefined,
     priority: priority !== "all" ? priority as any : undefined,
+    due: due !== "all" ? due as any : undefined,
   });
 
   const getCourse = (id: number) => courses.find(c => c.id === id);
@@ -90,6 +92,20 @@ export default function Tasks() {
             <SelectItem value="high">High</SelectItem>
             <SelectItem value="medium">Medium</SelectItem>
             <SelectItem value="low">Low</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={due} onValueChange={setDue}>
+          <SelectTrigger className="w-[150px] h-9">
+            <SelectValue placeholder="Due Date" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Any Due Date</SelectItem>
+            <SelectItem value="overdue">Overdue</SelectItem>
+            <SelectItem value="today">Due Today</SelectItem>
+            <SelectItem value="week">Due This Week</SelectItem>
+            <SelectItem value="month">Due This Month</SelectItem>
+            <SelectItem value="none">No Due Date</SelectItem>
           </SelectContent>
         </Select>
       </div>
