@@ -10,6 +10,12 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: courses
+    description: Course operations
+  - name: tasks
+    description: Task operations
+  - name: dashboard
+    description: Dashboard and activity operations
 paths:
   /healthz:
     get:
@@ -24,7 +30,302 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /courses:
+    get:
+      operationId: listCourses
+      tags: [courses]
+      summary: List all courses
+      responses:
+        "200":
+          description: A list of courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+    post:
+      operationId: createCourse
+      tags: [courses]
+      summary: Create a course
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{id}:
+    get:
+      operationId: getCourse
+      tags: [courses]
+      summary: Get a course by id
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: The course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      operationId: updateCourse
+      tags: [courses]
+      summary: Update a course
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteCourse
+      tags: [courses]
+      summary: Delete a course
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /tasks:
+    get:
+      operationId: listTasks
+      tags: [tasks]
+      summary: List tasks with optional filters
+      parameters:
+        - name: courseId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          description: Filter by completion status
+          schema:
+            type: string
+            enum: [all, active, completed]
+        - name: priority
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [low, medium, high]
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [assignment, reading, exam, project, other]
+      responses:
+        "200":
+          description: A list of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+  /tasks/{id}:
+    get:
+      operationId: getTask
+      tags: [tasks]
+      summary: Get a task by id
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: The task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a task
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteTask
+      tags: [tasks]
+      summary: Delete a task
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /tasks/{id}/toggle:
+    patch:
+      operationId: toggleTask
+      tags: [tasks]
+      summary: Toggle a task's completion status
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary stats
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /dashboard/upcoming:
+    get:
+      operationId: getUpcomingTasks
+      tags: [dashboard]
+      summary: Get tasks due soon
+      parameters:
+        - name: days
+          in: query
+          required: false
+          description: Number of days ahead to look
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Upcoming tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+  /dashboard/overdue:
+    get:
+      operationId: getOverdueTasks
+      tags: [dashboard]
+      summary: Get overdue tasks
+      responses:
+        "200":
+          description: Overdue tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+  /dashboard/activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Get recently created and updated tasks
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
 components:
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +334,194 @@ components:
           type: string
       required:
         - status
-
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    Course:
+      type: object
+      required:
+        - id
+        - name
+        - code
+        - color
+        - createdAt
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        color:
+          type: string
+        instructor:
+          type: ["string", "null"]
+        term:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+    CourseInput:
+      type: object
+      required:
+        - name
+        - code
+        - color
+      properties:
+        name:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
+        color:
+          type: string
+        instructor:
+          type: string
+        term:
+          type: string
+    CourseUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
+        color:
+          type: string
+        instructor:
+          type: ["string", "null"]
+        term:
+          type: ["string", "null"]
+    Task:
+      type: object
+      required:
+        - id
+        - courseId
+        - title
+        - priority
+        - type
+        - completed
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        courseId:
+          type: integer
+        title:
+          type: string
+        notes:
+          type: ["string", "null"]
+        dueDate:
+          type: ["string", "null"]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        type:
+          type: string
+          enum: [assignment, reading, exam, project, other]
+        completed:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    TaskInput:
+      type: object
+      required:
+        - courseId
+        - title
+      properties:
+        courseId:
+          type: integer
+        title:
+          type: string
+          minLength: 1
+        notes:
+          type: string
+        dueDate:
+          type: ["string", "null"]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        type:
+          type: string
+          enum: [assignment, reading, exam, project, other]
+    TaskUpdate:
+      type: object
+      properties:
+        courseId:
+          type: integer
+        title:
+          type: string
+          minLength: 1
+        notes:
+          type: ["string", "null"]
+        dueDate:
+          type: ["string", "null"]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        type:
+          type: string
+          enum: [assignment, reading, exam, project, other]
+        completed:
+          type: boolean
+    DashboardSummary:
+      type: object
+      required:
+        - totalTasks
+        - activeTasks
+        - completedTasks
+        - overdueTasks
+        - dueSoonTasks
+        - totalCourses
+        - courseStats
+      properties:
+        totalTasks:
+          type: integer
+        activeTasks:
+          type: integer
+        completedTasks:
+          type: integer
+        overdueTasks:
+          type: integer
+        dueSoonTasks:
+          type: integer
+        totalCourses:
+          type: integer
+        courseStats:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseStat"
+    CourseStat:
+      type: object
+      required:
+        - courseId
+        - name
+        - code
+        - color
+        - totalTasks
+        - activeTasks
+        - completedTasks
+      properties:
+        courseId:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        color:
+          type: string
+        totalTasks:
+          type: integer
+        activeTasks:
+          type: integer
+        completedTasks:
+          type: integer
