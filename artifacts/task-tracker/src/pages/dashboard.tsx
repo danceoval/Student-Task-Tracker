@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useGetDashboardSummary, useGetUpcomingTasks, useGetOverdueTasks, useGetRecentActivity, useListCourses } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
-import { BookOpen, CheckCircle, Clock, Plus, AlertCircle } from "lucide-react";
+import { BookOpen, CheckCircle, Clock, Plus, AlertCircle, Activity, Circle } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { TaskItem } from "@/components/tasks/task-item";
@@ -196,6 +197,53 @@ export default function Dashboard() {
               <div className="p-6 text-center border border-dashed rounded-xl bg-card">
                 <p className="text-sm text-muted-foreground mb-4">No courses tracked yet.</p>
                 <Button variant="outline" size="sm" onClick={() => setCourseFormOpen(true)}>Add Course</Button>
+              </div>
+            )}
+          </section>
+
+          <section>
+            <h2 className="text-xl font-serif font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Activity className="w-5 h-5" /> Recent Activity
+            </h2>
+            {loadingRecent || loadingCourses ? (
+              <div className="space-y-3">
+                <Skeleton className="h-12 w-full rounded-xl" />
+                <Skeleton className="h-12 w-full rounded-xl" />
+                <Skeleton className="h-12 w-full rounded-xl" />
+              </div>
+            ) : recentTasks.length > 0 ? (
+              <div className="rounded-xl border bg-card divide-y">
+                {recentTasks.slice(0, 10).map(task => {
+                  const course = getCourse(task.courseId);
+                  return (
+                    <div key={task.id} className="flex items-start gap-3 p-3">
+                      {task.completed ? (
+                        <CheckCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-muted-foreground/50 mt-0.5 shrink-0" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-sm truncate ${task.completed ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                          {task.title}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {course && (
+                            <span className="text-[10px] font-medium" style={{ color: course.color }}>
+                              {course.code}
+                            </span>
+                          )}
+                          <span className="text-[10px] text-muted-foreground">
+                            {task.completed ? "Completed" : "Updated"} {formatDistanceToNow(new Date(task.updatedAt), { addSuffix: true })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-6 text-center border border-dashed rounded-xl bg-card">
+                <p className="text-sm text-muted-foreground">No activity yet.</p>
               </div>
             )}
           </section>

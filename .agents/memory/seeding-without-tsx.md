@@ -1,23 +1,23 @@
 ---
-name: Seeding without tsx
-description: How to run/seed TypeScript DB logic in this pnpm monorepo when tsx is unavailable
+name: Seeding / running TS DB scripts without tsx
+description: Why standalone TS runner scripts fail in this pnpm monorepo and the durable pattern to use instead
 ---
 
-# Seeding the database in this monorepo
+# Running TypeScript DB logic in this monorepo
 
-`tsx` cannot be installed here (install fails), and Node's native TS type-stripping
-won't resolve the shared `lib/db` extensionless/directory imports (e.g. `./schema`),
-so a standalone `tsx ./src/seed.ts` CLI seed script does NOT work.
+`tsx` is NOT installable in this environment (install fails), and plain `node`'s
+native TS type-stripping won't resolve the shared db package's extensionless /
+directory imports. So a standalone `tsx ./seed.ts`-style CLI script does NOT work
+for seeds, backfills, or one-off DB scripts.
 
-**The working pattern:** put seed logic in `lib/db/src/seed.ts` as an exported
-idempotent function (`seedDatabaseIfEmpty()` — only inserts when the table is empty),
-export it from `lib/db/src/index.ts`, and call it from the api-server startup
-(`artifacts/api-server/src/index.ts`, inside `app.listen` callback).
+**Durable pattern:** run such logic through the already-bundled API server instead
+of a separate TS runner. Express the seed as an idempotent exported function and
+invoke it from the server's startup path.
 
-**Why:** the api-server is bundled with esbuild, which handles the workspace TS module
-resolution that plain `node` cannot. Running through the server avoids needing any
-extra TS runner.
+**Why:** the API server is bundled with esbuild, which resolves the workspace's TS
+module graph that a bare `node`/`tsx` invocation cannot. Piggybacking on it avoids
+needing any extra TS runtime.
 
-**How to apply:** for any "run a TS script against the DB" need (seeds, one-off
-migrations/backfills), prefer wiring it through the esbuild-bundled server rather than
-adding a standalone runner. Keep it idempotent so repeated startups are safe.
+**How to apply:** for any "run TS against the DB" need, prefer wiring it into the
+esbuild-bundled server's startup rather than adding a standalone runner. Always make
+it idempotent (guard on existing data) so repeated startups are safe.
